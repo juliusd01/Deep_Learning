@@ -59,7 +59,7 @@ class VolaPredictionLSTM:
     def __init__(self, no_lags=5):
         self.no_lags = no_lags
         self.model = Sequential()
-        self.model.add(LSTM(50, input_shape=(no_lags, 2)))
+        self.model.add(LSTM(50, dropout=0.2, input_shape=(no_lags, 2)))
         self.model.add(Dense(1))
         self.model.compile(optimizer='adam', loss='mse')
 
@@ -73,9 +73,21 @@ class VolaPredictionLSTM:
 
     def evaluate(self, X, y):
         predictions = self.predict(X)
-        print(predictions, y)
         mse = np.mean((y - predictions) ** 2)
         return mse
+    
+    def plot_volatility_predictions(model, X, y, title="Volatility Prediction (Train)"):
+        """Plot actual vs predicted volatility."""
+        y_pred = model.predict(X)
+        plt.figure(figsize=(12, 5))
+        plt.plot(y.values, label="Actual Volatility")
+        plt.plot(y_pred, label="Predicted Volatility")
+        plt.title(title)
+        plt.xlabel("Time")
+        plt.ylabel("Volatility")
+        plt.legend()
+        plt.tight_layout()
+        plt.show()
 
 
 
@@ -109,9 +121,10 @@ def prepare_sign_data(data, no_lags=5):
     return train_test_split(X, y, test_size=0.2, random_state=42, shuffle=False)
 
 
-def prepare_volatility_data(data, no_lags=5):
+def prepare_volatility_data(data, no_lags=5, rolling_window=5):
     data = data.copy()
-    data = data.iloc[5:]
+    data["volatility"] = data["LogRet"].rolling(window=rolling_window).std()
+    data = data.iloc[rolling_window:]
     
     # Target variable: Volatility tomorrow
     data['volatility_tomorrow'] = data['volatility'].shift(-1)
