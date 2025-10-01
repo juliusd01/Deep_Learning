@@ -2,3 +2,7 @@ yfinance
 numpy
 scikit-learn
 pandas
+torch
+matplotlib
+arch
+scikit-learn
