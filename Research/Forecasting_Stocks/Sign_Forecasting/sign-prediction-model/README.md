@@ -7,4 +7,5 @@ Features used by [Stanford Paper](http://cs230.stanford.edu/projects_fall_2019/r
 ## TODOs
 - Forecast different horizons using LSTM
 - Integrate more variables
-- 
+
+Potentially have two neurons at the end, one for vola, the other for sign. For "true" vola, just take GARCH(1,1)
