@@ -24,4 +24,10 @@ See folder 'data'.
 ### Macro Databases 
 - [FRED-MD](https://www.stlouisfed.org/research/economists/mccracken/fred-databases)
 - Seulki used cubic spline interpolation to get the quartely data also as monthly data
-- Potentially dropout variables on Stock Market or just use these values as the dependent variable
+- Potentially dropout variables on Stock Market as it might be too closely related to S&P 500 price
+- These variables are not standardized as the NN should handle different scales inherently
+
+
+### Architecture of Neural Networks
+- build separate networks for sign forecast and volatility forecast
+- creating one network with two output neurons would restrict the network to learn weights for both outputs until the last layer and only then differentiate and create own weights for sign and volatility. this seems like an unnecessary restriction.
