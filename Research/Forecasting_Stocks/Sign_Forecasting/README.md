@@ -1,10 +1,11 @@
 # Sign Forecasting of Asset Returns using DL
 
 Central Idea: 
+
 ![alt text](img/basic_idea.png)
 
 - volatility dynamics and non-zero asset return make asset return sign forecastable
-- forecastability is highest when average return is high and volatility is 
+- forecastability is highest when average return is high and volatility is low
 - biggest responsiveness in signs is at medium time horizons (20-40 trading days = 2-3 months)
 
 
