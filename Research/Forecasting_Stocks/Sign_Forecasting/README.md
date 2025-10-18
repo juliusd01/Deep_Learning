@@ -45,5 +45,16 @@ See folder 'data'.
 
 
 ### Architecture of Neural Networks
-- build separate networks for sign forecast and volatility forecast
+- build separate networks for sign forecast and absolute return forecast
 - creating one network with two output neurons would restrict the network to learn weights for both outputs until the last layer and only then differentiate and create own weights for sign and volatility. this seems like an unnecessary restriction.
+
+
+## Checklist
+- Forecast different horizons using LSTM
+- Standardize only the training set (if any standardization at all)
+- Diebold Mariano Test to evaluate if accuracy is better with LSTM/GRU
+
+
+### Goals
+- Outperform "raw" prediction of stock prices using Neural Networks with the decomposition into sign and absolute return forecast
+- Have a better accuracy (i.e. share of correct predictions) with sign classification compared to just predicting the majority class always. 
