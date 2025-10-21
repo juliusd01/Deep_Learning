@@ -47,6 +47,14 @@ See folder 'data'.
 ### Architecture of Neural Networks
 - build separate networks for sign forecast and absolute return forecast
 - creating one network with two output neurons would restrict the network to learn weights for both outputs until the last layer and only then differentiate and create own weights for sign and volatility. this seems like an unnecessary restriction.
+- batch_size is not a hyperparameter, it should be set based on available memory on GPU
+- a larger batch_size gives you a more exact gradient, but you can do less steps. contrary, small batch_size is more noisy for each step, but you can do more steps, which tends to work better in practice
+- - number of parameters only depends on hidden size, # features and # layers, not on the # lags
+- each input value gets 4 weights per LSTM cell in the first layer, if hidden_size=64, then the number of weights equals 4x(#features x 64) + 4x(64 x 64) for the recurrent weights. In each of the 4 gates, there is this 64x64 matrix with recurrent weights from the last timestep h_t-1
+- learning rate is most important parameter
+- [double descent](https://iopscience.iop.org/article/10.1088/1742-5468/ac3a74/pdf) implies test error descreases with more epochs/training data, then increases again when training error approaces zero and then decreases to new minima afterwards --> either use early stopping or train the neural network further after reaching 0 training error
+- Use tensors instead of numpy arrays, because tensors can run on GPU and are able to automatically differentiate
+
 
 
 ## Checklist
