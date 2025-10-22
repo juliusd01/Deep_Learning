@@ -1,0 +1,3 @@
+model,avg_rmse,avg_mae,avg_r2
+LSTM,,,
+GRU,,,
