@@ -20,6 +20,8 @@ also look at [this](https://www.sciencedirect.com/science/article/pii/S106294081
 
 # Data
 
+## Monthly 
+
 See folder 'data'.
 
 ### Macro Databases 
@@ -27,6 +29,10 @@ See folder 'data'.
 - Seulki used cubic spline interpolation to get the quartely data also as monthly data
 - Potentially dropout variables on Stock Market as it might be too closely related to S&P 500 price
 - These variables are not standardized as the NN should handle different scales inherently
+
+## Daily
+
+- Data source: Bloomberg
 
 ## Variables
 #### Forecasting directional movements of stock returns (daily)
@@ -42,7 +48,9 @@ See folder 'data'.
 
 ![alt text](img/image-1.png)
 
+# Methodology
 
+- [Kelly et al.](https://onlinelibrary.wiley.com/doi/full/10.1111/jofi.13298) show that complex models perform better than simple models. They suggest including all relevant predictors (but not arbitrarily many) and using nonlinear functions instead of linear models.
 
 ### Architecture of Neural Networks
 - build separate networks for sign forecast and absolute return forecast

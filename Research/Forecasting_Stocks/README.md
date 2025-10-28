@@ -1,4 +1,9 @@
-# Forecasting Stocks with high-frequency data
+# Stock return prediction Literature
+- in the 80's and 90's, several papers showed correlations (and therefore predictability) of variables like short and long-term treasury, corporate bonds, valuation ratios, interest rates, [relative valuation of high beta stocks to low-beta stocks](https://personal.lse.ac.uk/polk/research/ptv.pdf) with the stock returns (e.g. Fama and French 1989).
+- Goyal and Welch (GW, 2008) showed that many of these predictors are not significant for stock return forecasting over long time horizons than the original study. There is critiscm on the interpretation of the OOS R^2 by GW, since even with ngative OOS R^2 positive Sharpe ratios are obtainable (see [Kelly et al.](https://onlinelibrary.wiley.com/doi/full/10.1111/jofi.13298) ).
+
+
+## Forecasting Stocks with high-frequency data
 
 ### On the forecasting of high-frequency financial time seriesbased on ARIMA model improved by deep learning
 https://onlinelibrary.wiley.com/doi/full/10.1002/for.2677
@@ -15,7 +20,7 @@ https://onlinelibrary.wiley.com/doi/full/10.1002/for.2677
 #### Further Research Ideas
 - Apply same approach to optimize forecasting models such as GARCH for the volatility of high-frequency time series
 
-### Volatility forecasting for stock market incorporatingmacroeconomic variables based on GARCH-MIDAS anddeep learning models
+### Volatility forecasting for stock market incorporatingmacroeconomic variables based on GARCH-MIDAS and deep learning models
 https://onlinelibrary.wiley.com/doi/epdf/10.1002/for.2899
 
 - incorporate macroeconomoic variables to forecast short-term volatility within a GARCH-MIDAS model
@@ -23,15 +28,3 @@ https://onlinelibrary.wiley.com/doi/epdf/10.1002/for.2899
 - DL model used: gated recurrent unit (GRU) which is based on LSTM
 
 ![alt text](images/GRU_LSTM.png)
-
-
-### Stock index prediction based on wavelet transform and FCD-MLGRU
-https://onlinelibrary.wiley.com/doi/epdf/10.1002/for.2682
-
-- wavelet transform, filter cycle decomposition, multi lag gated recurrent unit (WT-FCD-MLGRU)
-- Empirical Analysis workflow:
-
-![Wavelet workflow](images/wavelet_workflow.png)
-
-- ARIMA model OLS as benchmark
-- data: daily closing prices of stock indices
