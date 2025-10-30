@@ -2,7 +2,7 @@
 |---:|---|---|---|---:|---:|---|
 | 1 | date |  |  |  |  |  |
 | 2 | price | price (index value) | Monthly | 187101 | 202412 |  |
-| 3 | d12 | 12-month dividends | Monthly | 187101 | 202412 |  |
+| 3 | d12 | 12-month dividends | Monthly | 187101 | 202412 | raw dividends, should be logged |
 | 4 | e12 | 12-month earnings | Monthly | 187101 | 202412 |  |
 | 5 | ret | return w/ dividends (CRSP calc) | Monthly | 192601 | 202412 | CRSP's calculation of S&P500 return (incl. dividends) |
 | 6 | retx | return w/o dividends (CRSP calc) | Monthly | 192601 | 202412 | CRSP's calculation of S&P500 return (excl. dividends) |
