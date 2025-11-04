@@ -10,7 +10,11 @@ def __get_IS_R2(ts_df, indep, dep, start=1930, end=2005):
     ts_in_sample = ts_df.loc[start:end]
 
     # OLS model with lagged independent variable
-    lagged_indep = ts_in_sample[indep].shift(1)
+    if indep == 'infl' and type(start) != int:
+        # special treatment for 'infl' as we wait 1 month to get inflation data (but only for monthly regression)
+        lagged_indep = ts_in_sample[indep].shift(2)
+    else:
+        lagged_indep = ts_in_sample[indep].shift(1)
     valid_idx = lagged_indep.dropna().index
     y = ts_in_sample.loc[valid_idx, dep]
     X = lagged_indep.loc[valid_idx]
@@ -18,7 +22,7 @@ def __get_IS_R2(ts_df, indep, dep, start=1930, end=2005):
     reg = OLS(y, X_const).fit()
     # get adjusted r2
     IS_R2 = reg.rsquared
-    IS_R2_head = IS_R2 - (1 - IS_R2)*(len(y)-int(reg.df_resid))/(len(y)-1)
+    IS_R2_head = IS_R2 - (1 - IS_R2)*(len(y)-int(reg.df_resid)-1)/(len(y)-1)
 
     return IS_R2_head, reg.resid
 
@@ -133,7 +137,11 @@ def OOS_analysis_monthly(ts_df, indep, dep, start, end, est_periods_OOS=240, exp
 
         # OLS model forecast using data up to pos (use iloc for positional slicing)
         ts_train = ts_df.iloc[start_pos:pos + 1]
-        lagged_indep_train = ts_train[indep].shift(1)
+        if indep == 'infl':
+            # special treatment for 'infl' as we wait 1 month to get inflation data
+            lagged_indep_train = ts_train[indep].shift(2)
+        else:
+            lagged_indep_train = ts_train[indep].shift(1)
         valid_idx_train = lagged_indep_train.dropna().index
         y_train = ts_train.loc[valid_idx_train, dep]
         X_train = lagged_indep_train.loc[valid_idx_train]
@@ -170,6 +178,9 @@ def OOS_analysis_monthly(ts_df, indep, dep, start, end, est_periods_OOS=240, exp
                 OOS_error_TU.append(pred_ERP_trunc - actual_ERP)
             else:
                 OOS_error_TU.append(pred_ERP - actual_ERP)
+    
+    OOS_error_TU = np.array(OOS_error_TU)
+    OOS_error_M = np.array(OOS_error_M)
 
     share_truncated = num_truncated/len(OOS_error_M)
     share_slope_zero = num_slope_zero/len(OOS_error_M)
@@ -188,10 +199,10 @@ def OOS_analysis_monthly(ts_df, indep, dep, start, end, est_periods_OOS=240, exp
 
     dRMSE = np.sqrt(MSE_M) - np.sqrt(MSE_TU)
 
-    return OOS_R2_head, share_truncated, share_slope_zero, OOS_R2_head_T, dRMSE
+    return OOS_R2_head, share_truncated, share_slope_zero, OOS_R2_head_T, dRMSE, OOS_error_M, OOS_error_TU
 
 
-def get_monthly_statistics(ts_df, indep, start, end, est_periods_OOS=240):
+def get_monthly_statistics(ts_df, indep, start, end, est_periods_OOS=240, plot='no'):
     dep = 'equity_premium'
     start_ts = pd.to_datetime(start)
     end_ts = pd.to_datetime(end)
@@ -205,7 +216,11 @@ def get_monthly_statistics(ts_df, indep, start, end, est_periods_OOS=240):
     IS_R2_head_log, IS_error_cond_log = __get_IS_R2(ts_df, indep, 'log_equity_premium', start_ts, end_ts)
 
     # 3. IS OLS model with lagged independent variable, equity premium
-    lagged_indep = ts_in_sample[indep].shift(1)
+    if indep == 'infl':
+        # special treatment for 'infl' as we wait 1 month to get inflation data
+        lagged_indep = ts_in_sample[indep].shift(2)
+    else:
+        lagged_indep = ts_in_sample[indep].shift(1)
     # Drop NA values due to lag
     valid_idx = lagged_indep.dropna().index
     y = ts_in_sample.loc[valid_idx, dep]
@@ -237,9 +252,41 @@ def get_monthly_statistics(ts_df, indep, start, end, est_periods_OOS=240):
     IS_R2_head_trunc = IS_R2_trunc - (1 - IS_R2_trunc) * (T - k) / (T - 1)
 
     # 5. OOS ANALYSIS
-    OOS_R2_head, share_truncated, share_slope_zero, OOS_R2_head_T, dRMSE = OOS_analysis_monthly(
+    OOS_R2_head, share_truncated, share_slope_zero, OOS_R2_head_T, dRMSE, OOS_error_M, OOS_error_TU = OOS_analysis_monthly(
         ts_df, indep, dep, start_ts, end_ts, est_periods_OOS, expected_sign=EXPECTED_SIGN
     )
+
+    if plot == 'yes':
+        # CREATE PLOT DATA with datetime indices
+        IS_sq_diff = pd.Series(
+            np.cumsum(IS_error_M.iloc[1:].values ** 2) - np.cumsum(IS_error_cond.values ** 2),
+            index=IS_error_M.iloc[1:].index
+        )
+        idx = ts_df.index
+        start_pos = idx.searchsorted(start, side='left')
+        end_pos = idx.searchsorted(end, side='right') - 1
+
+        # OOS_sq_diff: index from the OOS prediction dates
+        oos_dates = ts_df.index[start_pos + est_periods_OOS + 1 : end_pos + 1]
+        OOS_sq_diff = pd.Series(
+            np.cumsum(OOS_error_M ** 2) - np.cumsum(OOS_error_TU ** 2),
+            index=oos_dates
+        )
+
+        # IS_plot: full IS series, no vertical shift
+        first_oos_date = oos_dates[0]
+        IS_plot = IS_sq_diff - IS_sq_diff.loc[first_oos_date]
+
+        # Plotting
+        plt.figure(figsize=(10, 3))
+        plt.plot(IS_plot.index, IS_plot.values, label='IS')
+        plt.plot(OOS_sq_diff.index, OOS_sq_diff.values, label='OOS')
+        plt.axvspan(pd.to_datetime('1973-01-01'), pd.to_datetime('1975-12-31'), color='red', alpha=0.1)
+        plt.axvline(x=first_oos_date, color='black', linestyle='--', label='Start OOS')
+        plt.xlabel('Date')
+        plt.ylabel('Cumulative SSE Difference')
+        plt.legend()
+        plt.tight_layout()
 
     return {
         'IS_R2_head_log': round(float(IS_R2_head_log)*100, 2),
