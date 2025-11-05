@@ -1,8 +1,17 @@
 import numpy as np
 import pandas as pd
+from sklearn.discriminant_analysis import StandardScaler
 from statsmodels.regression.linear_model import OLS
 from statsmodels.tools import add_constant
 import matplotlib.pyplot as plt
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import TensorDataset, DataLoader
+from sklearn.metrics import mean_squared_error
+from tqdm import tqdm
+
+from models import ReturnLSTM, ReturnGRU, SignLSTM
 
 
 def __get_IS_R2(ts_df, indep, dep, start=1930, end=2005):
@@ -298,3 +307,174 @@ def get_monthly_statistics(ts_df, indep, start, end, est_periods_OOS=240, plot='
         'OOS_R2_head_trunc': round(float(OOS_R2_head_T)*100, 2),
         'dRMSE': round(float(dRMSE)*100, 4)
     }
+
+def __create_lagged_matrix(X, window):
+    """Create lagged sequences for time series."""
+    out = []
+    for i in range(window, len(X)):
+        out.append(X[i-window:i, :])
+    return np.array(out)
+
+def get_return_Forecast_DL(data: pd.DataFrame, y: pd.Series, num_lags: int, num_layers: int, hidden_dim: int,
+                           epochs: int, batch_size: int, lr: float, dropout: float, retrain_frequency: int) -> pd.DataFrame:
+    
+
+    # Set seeds for reproducibility
+    torch.manual_seed(42)
+    np.random.seed(42)
+
+    features = data.to_numpy()
+
+    X_lagged = __create_lagged_matrix(features, num_lags)
+    y_target = y.values[num_lags:]
+    dates_lagged = data.index[num_lags:]
+
+    min_train_months = 240  # minimum training period
+    test_block_months = retrain_frequency
+    total_months = len(dates_lagged)
+    window_results = []
+
+    for test_start_pos in tqdm(range(min_train_months, total_months, test_block_months), desc="monthly expanding window"):
+        test_end_pos = min(test_start_pos + test_block_months, total_months)
+        train_idx = np.arange(0, test_start_pos)
+        test_idx = np.arange(test_start_pos, test_end_pos)
+
+        #scaler = StandardScaler()
+        #X_lagged_scaled = scaler.fit_transform(X_lagged.reshape(-1, X_lagged.shape[-1])).reshape(X_lagged.shape)
+
+        # prepare split
+        X_tr = X_lagged[train_idx]
+        y_tr = y_target[train_idx]
+        X_te = X_lagged[test_idx]
+        y_te = y_target[test_idx]
+        input_dim = X_tr.shape[2]
+
+        # tensors
+        X_tr_t = torch.tensor(X_tr, dtype=torch.float32)
+        y_tr_t = torch.tensor(y_tr.reshape(-1,1), dtype=torch.float32)
+        X_te_t = torch.tensor(X_te, dtype=torch.float32)
+
+        # new model per block
+        model_window = ReturnLSTM(input_dim=input_dim, hidden_dim=hidden_dim, num_layers=num_layers, dropout=dropout)
+        optimizer = optim.Adam(model_window.parameters(), lr=lr)
+        criterion = nn.MSELoss()
+
+        ds = TensorDataset(X_tr_t, y_tr_t)
+        data_loader = DataLoader(ds, batch_size=batch_size, shuffle=True)
+
+        # train
+        for epoch in range(epochs):
+            for X_batch, y_batch in data_loader:
+                optimizer.zero_grad()
+                pred = model_window(X_batch)
+                loss = criterion(pred, y_batch)
+                loss.backward()
+                optimizer.step()
+
+        # predict for the block
+        model_window.eval()
+        with torch.no_grad():
+            y_pred = model_window(X_te_t).numpy()
+
+        # Save results
+        window_df = pd.DataFrame({
+            'Actual_Value': y_te,
+            'Predicted_Value': y_pred.flatten(),
+            'Train_End': dates_lagged[test_start_pos - 1].date(),
+            'Test_Start': dates_lagged[test_start_pos].date(),
+            'Test_End': dates_lagged[test_end_pos - 1].date()
+        }, index=dates_lagged[test_idx])
+
+        window_results.append(window_df)
+
+    # combine
+    if window_results:
+        results = pd.concat(window_results).sort_index()
+    else:
+        print("No windows produced.")
+
+    return results
+
+
+def get_sign_forecast(data: pd.DataFrame, y: pd.Series, num_lags: int, num_layers: int, hidden_dim: int,
+                      epochs: int, batch_size: int, lr: float, dropout: float, retrain_frequency: int) -> pd.DataFrame:
+    
+
+    # Set seeds for reproducibility
+    torch.manual_seed(42)
+    np.random.seed(42)
+
+    features = data.to_numpy()
+
+    X_lagged = __create_lagged_matrix(features, num_lags)
+    y_target = y.values[num_lags:]
+    dates_lagged = data.index[num_lags:]
+
+    min_train_months = 240  # minimum training period
+    test_block_months = retrain_frequency
+    total_months = len(dates_lagged)
+    window_results = []
+
+    for test_start_pos in tqdm(range(min_train_months, total_months, test_block_months), desc="monthly expanding window"):
+        test_end_pos = min(test_start_pos + test_block_months, total_months)
+        train_idx = np.arange(0, test_start_pos)
+        test_idx = np.arange(test_start_pos, test_end_pos)
+
+        #scaler = StandardScaler()
+        #X_lagged_scaled = scaler.fit_transform(X_lagged.reshape(-1, X_lagged.shape[-1])).reshape(X_lagged.shape)
+
+        # prepare split
+        X_tr = X_lagged[train_idx]
+        y_tr = y_target[train_idx]
+        X_te = X_lagged[test_idx]
+        y_te = y_target[test_idx]
+        input_dim = X_tr.shape[2]
+
+        # tensors
+        X_tr_t = torch.tensor(X_tr, dtype=torch.float32)
+        y_tr_t = torch.tensor(y_tr.reshape(-1,1), dtype=torch.float32)
+        X_te_t = torch.tensor(X_te, dtype=torch.float32)
+
+        # new model per block
+        model_window = SignLSTM(input_dim=input_dim, hidden_dim=hidden_dim, num_layers=num_layers, dropout=dropout)
+        optimizer = optim.Adam(model_window.parameters(), lr=lr)
+        criterion = nn.CrossEntropyLoss()
+
+        ds = TensorDataset(X_tr_t, y_tr_t)
+        data_loader = DataLoader(ds, batch_size=batch_size, shuffle=True)
+
+        # train
+        for epoch in range(epochs):
+            for X_batch, y_batch in data_loader:
+                optimizer.zero_grad()
+                logits = model_window(X_batch)
+                loss = criterion(logits, y_batch)
+                loss.backward()
+                optimizer.step()
+
+        # predict for the block
+        model_window.eval()
+        with torch.no_grad():
+            logits_te = model_window(X_te_t)
+            probs_te = torch.softmax(logits_te, dim=1).cpu().numpy()
+            y_pred_cls = probs_te.argmax(axis=1)
+            y_pred_pos = probs_te[:, 1]
+
+        window_df = pd.DataFrame({
+            'Actual_Class': y_te,
+            'Predicted_Class': y_pred_cls,
+            'Predicted_Prob_Pos': y_pred_pos,
+            'Train_End': dates_lagged[test_start_pos - 1].date(),
+            'Test_Start': dates_lagged[test_start_pos].date(),
+            'Test_End': dates_lagged[test_end_pos - 1].date()
+        }, index=dates_lagged[test_idx])
+
+        window_results.append(window_df)
+
+    # combine
+    if window_results:
+        results = pd.concat(window_results).sort_index()
+    else:
+        print("No windows produced.")
+
+    return results
