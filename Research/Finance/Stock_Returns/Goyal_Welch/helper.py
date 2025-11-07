@@ -1,3 +1,4 @@
+from pyexpat import model
 import numpy as np
 import pandas as pd
 from sklearn.discriminant_analysis import StandardScaler
@@ -316,20 +317,20 @@ def __create_lagged_matrix(X, window):
     return np.array(out)
 
 def get_return_Forecast_DL(data: pd.DataFrame, y: pd.Series, num_lags: int, num_layers: int, hidden_dim: int,
-                           epochs: int, batch_size: int, lr: float, dropout: float, retrain_frequency: int) -> pd.DataFrame:
+                           epochs: int, batch_size: int, lr: float, dropout: float, minimum_train_months: int,
+                           retrain_frequency: int, rnn_model: str) -> pd.DataFrame:
     
 
     # Set seeds for reproducibility
     torch.manual_seed(42)
     np.random.seed(42)
-
     features = data.to_numpy()
 
     X_lagged = __create_lagged_matrix(features, num_lags)
     y_target = y.values[num_lags:]
     dates_lagged = data.index[num_lags:]
 
-    min_train_months = 240  # minimum training period
+    min_train_months = minimum_train_months
     test_block_months = retrain_frequency
     total_months = len(dates_lagged)
     window_results = []
@@ -355,7 +356,12 @@ def get_return_Forecast_DL(data: pd.DataFrame, y: pd.Series, num_lags: int, num_
         X_te_t = torch.tensor(X_te, dtype=torch.float32)
 
         # new model per block
-        model_window = ReturnLSTM(input_dim=input_dim, hidden_dim=hidden_dim, num_layers=num_layers, dropout=dropout)
+        if rnn_model == 'lstm':
+            model_window = ReturnLSTM(input_dim=input_dim, hidden_dim=hidden_dim, num_layers=num_layers, dropout=dropout)
+        elif rnn_model == 'gru':
+            model_window = ReturnGRU(input_dim=input_dim, hidden_dim=hidden_dim, num_layers=num_layers, dropout=dropout)
+        else:
+            raise ValueError("Model type not recognized. Use 'lstm' or 'gru'.")
         optimizer = optim.Adam(model_window.parameters(), lr=lr)
         criterion = nn.MSELoss()
 
@@ -380,9 +386,6 @@ def get_return_Forecast_DL(data: pd.DataFrame, y: pd.Series, num_lags: int, num_
         window_df = pd.DataFrame({
             'Actual_Value': y_te,
             'Predicted_Value': y_pred.flatten(),
-            'Train_End': dates_lagged[test_start_pos - 1].date(),
-            'Test_Start': dates_lagged[test_start_pos].date(),
-            'Test_End': dates_lagged[test_end_pos - 1].date()
         }, index=dates_lagged[test_idx])
 
         window_results.append(window_df)
@@ -438,7 +441,7 @@ def get_sign_forecast(data: pd.DataFrame, y: pd.Series, num_lags: int, num_layer
         # new model per block
         model_window = SignLSTM(input_dim=input_dim, hidden_dim=hidden_dim, num_layers=num_layers, dropout=dropout)
         optimizer = optim.Adam(model_window.parameters(), lr=lr)
-        criterion = nn.CrossEntropyLoss()
+        criterion = nn.BCEWithLogitsLoss()
 
         ds = TensorDataset(X_tr_t, y_tr_t)
         data_loader = DataLoader(ds, batch_size=batch_size, shuffle=True)
@@ -447,23 +450,22 @@ def get_sign_forecast(data: pd.DataFrame, y: pd.Series, num_lags: int, num_layer
         for epoch in range(epochs):
             for X_batch, y_batch in data_loader:
                 optimizer.zero_grad()
-                logits = model_window(X_batch)
-                loss = criterion(logits, y_batch)
+                logit = model_window(X_batch)  # (B, 1)
+                loss = criterion(logit, y_batch) 
                 loss.backward()
                 optimizer.step()
 
         # predict for the block
         model_window.eval()
         with torch.no_grad():
-            logits_te = model_window(X_te_t)
-            probs_te = torch.softmax(logits_te, dim=1).cpu().numpy()
-            y_pred_cls = probs_te.argmax(axis=1)
-            y_pred_pos = probs_te[:, 1]
+            logit_te = model_window(X_te_t)  # (N_te, 1)
+            p_pos = torch.sigmoid(logit_te).squeeze(1).cpu().numpy()  # Prob of positive class
+            y_pred_cls = (p_pos >= 0.5).astype(int)
 
         window_df = pd.DataFrame({
             'Actual_Class': y_te,
             'Predicted_Class': y_pred_cls,
-            'Predicted_Prob_Pos': y_pred_pos,
+            'Predicted_Prob_Pos': p_pos,
             'Train_End': dates_lagged[test_start_pos - 1].date(),
             'Test_Start': dates_lagged[test_start_pos].date(),
             'Test_End': dates_lagged[test_end_pos - 1].date()

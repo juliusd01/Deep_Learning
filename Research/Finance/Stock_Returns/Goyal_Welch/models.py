@@ -35,7 +35,7 @@ class SignLSTM(nn.Module):
         super(SignLSTM, self).__init__()
         self.lstm = nn.LSTM(input_dim, hidden_dim, num_layers, 
                            batch_first=True, dropout=dropout)
-        self.fc = nn.Linear(hidden_dim, 2)  # Two output classes
+        self.fc = nn.Linear(hidden_dim, 1)  # Single output for binary classification
         
     def forward(self, x):
         out, _ = self.lstm(x)
