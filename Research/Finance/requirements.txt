@@ -5,5 +5,4 @@ pandas
 torch
 matplotlib
 arch
-scikit-learn
 tqdm
