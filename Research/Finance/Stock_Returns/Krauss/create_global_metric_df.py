@@ -3,7 +3,7 @@ from pathlib import Path
 import glob
 
 # Get all CSV files from the output folder
-output_folder = Path('Research/Finance/Stock_Returns/Krauss/data/predictions')
+output_folder = Path('Research/Finance/Stock_Returns/Krauss/data/predictions/pytorch_2nd')
 csv_files = sorted(glob.glob(str(output_folder / 'predictions_*.csv')))
 K = 150
 
@@ -56,7 +56,7 @@ for csv_file in csv_files:
         accuracy_top_k = top_k['actual_class'].sum()/K
         top_stocks = top_k['stock'].tolist()
 
-        overall_return = avg_return_flop_k + avg_return_top_k
+        overall_return = (avg_return_flop_k + avg_return_top_k)
         
         metrics_data.append({
             'year': year,
