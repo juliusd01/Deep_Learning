@@ -5,7 +5,7 @@ import glob
 # Get all CSV files from the output folder
 output_folder = Path('Research/Finance/Stock_Returns/Krauss/data/predictions/pytorch_2nd')
 csv_files = sorted(glob.glob(str(output_folder / 'predictions_*.csv')))
-K = 150
+K = 10
 
 def get_top_flop_k(k: int, data: pd.DataFrame, unique_dates):
 

@@ -189,7 +189,6 @@ class xLSTMStockPredictor(nn.Module):
         
         # Output layers
         self.fc = nn.Linear(hidden_size, num_classes)
-        self.softmax = nn.Softmax(dim=1)
     
     def forward(self, x):
         """
@@ -211,7 +210,6 @@ class xLSTMStockPredictor(nn.Module):
         
         # Classification head
         out = self.fc(x)
-        out = self.softmax(out)
         return out
 
 
