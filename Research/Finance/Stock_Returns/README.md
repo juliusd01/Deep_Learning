@@ -69,8 +69,3 @@ See folder 'data'.
 - Forecast different horizons using LSTM
 - Standardize only the training set (if any standardization at all)
 - Diebold Mariano Test to evaluate if accuracy is better with LSTM/GRU
-
-
-### Goals
-- Outperform "raw" prediction of stock prices using Neural Networks with the decomposition into sign and absolute return forecast
-- Have a better accuracy (i.e. share of correct predictions) with sign classification compared to just predicting the majority class always. 

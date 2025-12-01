@@ -14,6 +14,7 @@ currently, every couple of sequence and target is treated as independent. the we
 ### sliding vs expanding window
 - what is actually the reason to not use an expanding window?
 - might we get a better performance for recent years, where krauss and fischer noted a meltdown of lstm arbitrage
+- CAUTION: Only standardize training data!!!
 
 ### training data
 - why use only the training data of S&P500 companies, when there are many more available? I guess it kind of makes sense because in other markets there might not be same growth dynamics/ different return sequences and then distribution of training and test is not equal. on the other side, this could be interpreted as adding noise to the model which might help in generalizing better to unseen data (though this seems slightly questionable)
