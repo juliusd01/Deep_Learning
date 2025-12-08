@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Get all parquet files from the output folder
-output_folder = Path('Research/Finance/Stock_Returns/Krauss/results/lstm/h_25_l_3_lr_0.001_lag_60')
+output_folder = Path('Research/Finance/Stock_Returns/Krauss/results/lstm/lag_60/h_25_l_10_lr_0.001_lag_60')
 csv_files = sorted(glob.glob(str(output_folder / 'predictions_*.parquet')))
 
 K_list = [10, 50, 100, 150, 200]
@@ -122,7 +122,7 @@ def summarize_global_metrics(folder_path: str, k: int):
             summary_statistics = pd.concat([summary_statistics, summary_stats], ignore_index=True)
     return global_metric_df, summary_statistics
 
-def accuracy_per_year(metric_df: pd.DataFrame):
+def accuracy_per_year(metric_df: pd.DataFrame, img_name: str):
     for config_name, group_df in metric_df.groupby('model_config'):
         #print(f'Accuracy for {config_name}: {group_df['accuracy'].to_list()}')
         plt.plot(group_df['year'], group_df['avg_accuracy'], marker='o', label=config_name)
@@ -131,23 +131,23 @@ def accuracy_per_year(metric_df: pd.DataFrame):
     plt.title('Model Accuracy per Year')
     plt.legend()
     plt.grid(True)
-    plt.savefig('Research/Finance/Stock_Returns/Krauss/img/accuracy_layers_lag240.png')
+    plt.savefig(f'Research/Finance/Stock_Returns/Krauss/img/{img_name}')
     plt.close()
 
-def return_per_year(metric_df: pd.DataFrame):
+def return_per_year(metric_df: pd.DataFrame, img_name: str):
     for config_name, group_df in metric_df.groupby('model_config'):
         #print(f'Accuracy for {config_name}: {group_df['accuracy'].to_list()}')
         plt.plot(group_df['year'], group_df['avg_overall_return'], marker='o', label=config_name)
     plt.xlabel('Year')
-    plt.ylabel('Overall Return')
-    plt.title('Model Overall Return per Year')
+    plt.ylabel('Daily Return')
+    plt.title('Daily Return by Year')
     plt.legend()
     plt.grid()
-    plt.savefig('Research/Finance/Stock_Returns/Krauss/img/return_layers_lag240.png')
+    plt.savefig(f'Research/Finance/Stock_Returns/Krauss/img/{img_name}')
     plt.close()
 
 #create_metric_df(csv_files, output_folder)
-gmdf, summary_stats = summarize_global_metrics('Research/Finance/Stock_Returns/Krauss/results/lstm', k=10)
+gmdf, summary_stats = summarize_global_metrics('Research/Finance/Stock_Returns/Krauss/results/lstm/lag_240', k=10)
 print(summary_stats)
-#accuracy_per_year(gmdf)
-#return_per_year(gmdf)
+accuracy_per_year(gmdf, img_name='accuracy_layers_lag240.png')
+return_per_year(gmdf, img_name='return_layers_lag240.png')
