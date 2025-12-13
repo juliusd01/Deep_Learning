@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Get all parquet files from the output folder
-output_folder = Path('Research/Finance/Stock_Returns/Krauss/results/lstm/lag_60/h_25_l_10_lr_0.001_lag_60')
+output_folder = Path('Research/Finance/Stock_Returns/Krauss/results/lstm/lag_60_sector/h_25_l_1_lr_0.001_lag_60')
 csv_files = sorted(glob.glob(str(output_folder / 'predictions_*.parquet')))
 
 K_list = [10, 50, 100, 150, 200]
@@ -147,7 +147,7 @@ def return_per_year(metric_df: pd.DataFrame, img_name: str):
     plt.close()
 
 #create_metric_df(csv_files, output_folder)
-gmdf, summary_stats = summarize_global_metrics('Research/Finance/Stock_Returns/Krauss/results/lstm/lag_240', k=10)
+gmdf, summary_stats = summarize_global_metrics('Research/Finance/Stock_Returns/Krauss/results/lstm/lag_60_sector', k=10)
 print(summary_stats)
-accuracy_per_year(gmdf, img_name='accuracy_layers_lag240.png')
-return_per_year(gmdf, img_name='return_layers_lag240.png')
+accuracy_per_year(gmdf, img_name='accuracy_lag60_sector.png')
+return_per_year(gmdf, img_name='return_lag60_sector.png')

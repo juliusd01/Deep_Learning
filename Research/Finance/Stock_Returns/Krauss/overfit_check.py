@@ -88,7 +88,7 @@ test_dataset = TensorDataset(X_test_tensor, y_test_tensor)
 g = torch.Generator()
 g.manual_seed(seed)
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, generator=g)
-test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, generator=g)
+test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
 # Define loss and optimizer
 criterion = nn.CrossEntropyLoss()

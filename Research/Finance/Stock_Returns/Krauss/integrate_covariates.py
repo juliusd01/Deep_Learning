@@ -50,7 +50,7 @@ def __merge_covariates(df, covariate, cov_name, year, seq_length=60, standardize
 
     return df
 
-for year in range(2017,2025):
+for year in range(1998,2025):
     return_data = pd.read_parquet(f'Research/Finance/Stock_Returns/Krauss/data/returns_per_period/lag_60/returns_{year}.parquet')
     # get dates from return data, which should also exist in the covariates data
     dates = return_data['date'].unique().tolist()
