@@ -3,7 +3,6 @@ import pandas as pd
 
 sectors = pd.read_csv('Research/Finance/confidential_data/LSEG/Company_Sector.csv', usecols=['Instrument', 'Economic_Sector'])
 print(sectors['Economic_Sector'].value_counts())
-exit()
 # stock to industry sector mapping
 stoi = {row['Instrument']: row['Economic_Sector'] for _, row in sectors.iterrows()}
 
