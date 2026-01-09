@@ -1,10 +1,9 @@
 import torch
 import matplotlib.pyplot as plt
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
 
 
-model = torch.load("Research/Finance/Stock_Returns/Krauss/models/lstm/sector/best_lstm_model_1998.pth")
+model = torch.load("Research/Finance/Stock_Returns/Krauss/models/lstm/sector/h_25_l_1_lr_0.001_lag_60/best_lstm_model_2020.pth")
 sector_weights = model["sector_embedding.weight"]
 
 # Sector mapping for 10 sectors: 

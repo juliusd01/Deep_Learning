@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 
 oil = pd.read_csv('Research/Finance/confidential_data/Bloomberg/oil_prices.csv', index_col='date', parse_dates=['date'])
 oil = oil['PX_LAST']

@@ -67,8 +67,8 @@ y = np.argmax(y, axis=1)
 # For overfitting test: use only 30 training samples and 20 test samples from the same data
 X_train = X[:1000]
 y_train = y[:1000]
-X_test = X[1000:1020]
-y_test = y[1000:1020]
+X_test = X[1000:1200]
+y_test = y[1000:1200]
 
 print(f"\nOverfitting Check - Train size: {len(X_train)}, Test size: {len(X_test)}")
 
