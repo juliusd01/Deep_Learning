@@ -11,24 +11,24 @@ csv_files = sorted(glob.glob(str(output_folder / 'predictions_*.parquet')))
 K_list = [10]#, 50, 100, 150, 200]
 
 def get_top_flop_k(k: int, data: pd.DataFrame, unique_dates):
-    
+
     top_stocks_by_date = {}
 
     for i, date in enumerate(unique_dates):
         date_data = data[data['date'] == date]
-        
+
         # Top k for Class 0 (below median) - shuffle to randomize ties
         top_class0 = date_data.nlargest(k, 'pred_Class0', keep='all')
         if len(top_class0) > k:
             top_class0 = top_class0.sample(n=k, random_state=43+i)
         top_class0 = top_class0[['stock', 'pred_Class0', 'pred_Class1', 'return', 'predicted_class', 'actual_class']]
-        
+
         # Top k for Class 1 (above median) - shuffle to randomize ties
         top_class1 = date_data.nlargest(k, 'pred_Class1', keep='all')
         if len(top_class1) > k:
             top_class1 = top_class1.sample(n=k, random_state=42+i)
         top_class1 = top_class1[['stock', 'pred_Class1', 'pred_Class0', 'return', 'predicted_class', 'actual_class']]
-        
+
         top_stocks_by_date[date] = {
             'top_class0': top_class0,
             'top_class1': top_class1
@@ -46,7 +46,7 @@ def create_metric_df(CSV_files, results_folder):
             # Extract year from filename (e.g., predictions_2005.parquet -> 2005)
             year = Path(csv_file).stem.split('_')[-1]
             print(f"Processing year: {year}")
-            
+
             # Read the parquet file
             results_df = pd.read_parquet(csv_file)
             unique_dates = sorted(results_df['date'].unique())
@@ -66,7 +66,7 @@ def create_metric_df(CSV_files, results_folder):
                 top_stocks = top_k['stock'].tolist()
 
                 overall_return = (avg_return_flop_k + avg_return_top_k)
-                
+
                 metrics_data.append({
                     'year': year,
                     'date': date,
@@ -92,7 +92,7 @@ def create_metric_df(CSV_files, results_folder):
         print(f"Total rows: {len(metrics_df)}")
         print("\nSummary by year:")
         print(metrics_df.groupby('year')[['avg_return_flop_k', 'avg_return_top_k', 'overall_return', 'accuracy']].mean())
-    
+
 
 def summarize_global_metrics(folder_path: str, k: int):
     folder = Path(folder_path)
