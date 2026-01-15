@@ -4,6 +4,7 @@
 - conformal predictions
 - transfer learning (maybe use for xLSTM)
 - Predicting port congestion, shipping delays, or raw material shortages with AIS Data: Real-time location data of global cargo ships. Model this as a graph network to see how a delay in Shanghai has effects on prices in Germany.
+- Effect of Trump's Truth Social Posts on European Defense Stocks (hypothesis: peace talks for ukraine decreases defense stocks)
 
 ## Data sources
 

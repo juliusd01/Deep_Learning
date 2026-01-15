@@ -1,0 +1,255 @@
+{
+  "meta": {
+    "milliseconds": 6,
+    "total_hits": 278,
+    "page_size": 50,
+    "page": 7,
+    "from": 300,
+    "page_count": 6,
+    "pagination": {
+      "previous_page": "http://api.factsquared.com/json/factba.se-trump-social.php?q=ukraine&platform=Truth+Social&page=6&sort=date&sort_order=desc",
+      "next_page": null
+    }
+  },
+  "data": [],
+  "stats": {
+    "deleted": {
+      "deleted": 6,
+      "not_deleted": 272
+    },
+    "platform": {
+      "truth_social": 278,
+      "x_twitter": 0,
+      "unknown": 0
+    },
+    "year_month": {
+      "2022": {
+        "total": 31,
+        "5": 7,
+        "6": 1,
+        "7": 0,
+        "8": 0,
+        "9": 11,
+        "10": 6,
+        "11": 1,
+        "12": 5
+      },
+      "2023": {
+        "total": 102,
+        "1": 16,
+        "2": 14,
+        "3": 8,
+        "4": 3,
+        "5": 7,
+        "6": 9,
+        "7": 9,
+        "8": 8,
+        "9": 8,
+        "10": 11,
+        "11": 2,
+        "12": 7
+      },
+      "2024": {
+        "total": 60,
+        "1": 7,
+        "2": 5,
+        "3": 7,
+        "4": 6,
+        "5": 1,
+        "6": 4,
+        "7": 9,
+        "8": 5,
+        "9": 6,
+        "10": 6,
+        "11": 1,
+        "12": 3
+      },
+      "2025": {
+        "total": 84,
+        "1": 1,
+        "2": 10,
+        "3": 11,
+        "4": 7,
+        "5": 9,
+        "6": 5,
+        "7": 1,
+        "8": 11,
+        "9": 8,
+        "10": 7,
+        "11": 11,
+        "12": 3
+      },
+      "2026": {
+        "total": 1,
+        "1": 1
+      }
+    },
+    "date_range": {
+      "last_hour": {
+        "total": 0,
+        "deleted": {
+          "true": 0,
+          "false": 0
+        },
+        "platform": {
+          "truth_social": 0,
+          "x_twitter": 0
+        }
+      },
+      "last_day": {
+        "total": 0,
+        "deleted": {
+          "true": 0,
+          "false": 0
+        },
+        "platform": {
+          "truth_social": 0,
+          "x_twitter": 0
+        }
+      },
+      "last_week": {
+        "total": 0,
+        "deleted": {
+          "true": 0,
+          "false": 0
+        },
+        "platform": {
+          "truth_social": 0,
+          "x_twitter": 0
+        }
+      },
+      "last_month": {
+        "total": 3,
+        "deleted": {
+          "true": 3,
+          "false": 0
+        },
+        "platform": {
+          "truth_social": 3,
+          "x_twitter": 0
+        }
+      },
+      "last_year": {
+        "total": 84,
+        "deleted": {
+          "true": 82,
+          "false": 2
+        },
+        "platform": {
+          "truth_social": 84,
+          "x_twitter": 0
+        }
+      },
+      "term_first": {
+        "total": 0,
+        "deleted": {
+          "true": 0,
+          "false": 0
+        },
+        "platform": {
+          "truth_social": 0,
+          "x_twitter": 0
+        }
+      },
+      "term_second": {
+        "total": 194,
+        "deleted": {
+          "true": 190,
+          "false": 4
+        },
+        "platform": {
+          "truth_social": 194,
+          "x_twitter": 0
+        }
+      },
+      "term_both": {
+        "total": 194,
+        "deleted": {
+          "true": 0,
+          "false": 0
+        },
+        "platform": {
+          "truth_social": 194,
+          "x_twitter": 0
+        }
+      },
+      "campaign_first": {
+        "total": 0,
+        "deleted": {
+          "true": 0,
+          "false": 0
+        },
+        "platform": {
+          "truth_social": 0,
+          "x_twitter": 0
+        }
+      },
+      "campaign_second": {
+        "total": 169,
+        "deleted": {
+          "true": 166,
+          "false": 3
+        },
+        "platform": {
+          "truth_social": 169,
+          "x_twitter": 0
+        }
+      },
+      "campaign_both": {
+        "total": 169,
+        "deleted": {
+          "true": 166,
+          "false": 3
+        },
+        "platform": {
+          "truth_social": 169,
+          "x_twitter": 0
+        }
+      },
+      "pre_campaign_first": {
+        "total": 0,
+        "deleted": {
+          "true": 0,
+          "false": 0
+        },
+        "platform": {
+          "truth_social": 0,
+          "x_twitter": 0
+        }
+      },
+      "pre_term_first": {
+        "total": 0,
+        "deleted": {
+          "true": 0,
+          "false": 0
+        },
+        "platform": {
+          "truth_social": 0,
+          "x_twitter": 0
+        }
+      },
+      "terms_in_between_pre_campaign": {
+        "total": 25,
+        "deleted": {
+          "true": 24,
+          "false": 1
+        },
+        "platform": {
+          "truth_social": 25,
+          "x_twitter": 0
+        }
+      },
+      "terms_in_between": {
+        "total": 194,
+        "deleted": {
+          "true": 190,
+          "false": 4
+        },
+        "platform": {
+          "truth_social": 194,
+          "x_twitter": 0
+        }
+      }
+    }
+  }
+}
